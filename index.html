@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quản Lý Quán - Full 33 Món</title>
+    <style>
+        :root { --primary: #4361ee; --success: #2ec4b6; --danger: #e71d36; --warning: #ffb703; --bg: #f0f2f5; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; padding-bottom: 80px; }
+        .card { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .category-header { background: #333; color: white; padding: 4px 10px; border-radius: 5px; font-size: 11px; margin: 12px 0 6px 0; text-transform: uppercase; display: inline-block; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .menu-item { background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .menu-item b { font-size: 11px; flex: 1; }
+        .menu-item span { color: var(--primary); font-weight: bold; font-size: 11px; }
+        .car-card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 12px; border-left: 6px solid var(--primary); position: relative; }
+        .expired { background: var(--danger) !important; color: white !important; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .bill-box { background: white; width: 90%; max-width: 350px; padding: 20px; border-radius: 15px; font-family: monospace; }
+        .bill-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        input { padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; margin-bottom: 8px; width: 100%; box-sizing: border-box; }
+        .btn-main { background: var(--primary); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; }
+        .btn-pay { background: var(--success); color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; font-weight: bold; margin-top: 10px; }
+        .status-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px; display: none; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); border-top: 3px solid var(--warning); z-index: 999; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h3 style="text-align:center; color:var(--primary); margin:0 0 10px 0;">MENU & TÍNH GIỜ</h3>
+    <button onclick="requestNoti()" style="background:#6c757d; color:white; border:none; padding:8px; border-radius:8px; width:100%; font-size:11px; margin-bottom:10px;">🔔 BẬT THÔNG BÁO NỀN</button>
+    
+    <input type="text" id="cusName" placeholder="Tên khách/Xe">
+    <input type="text" id="tableNo" placeholder="Bàn">
+    <input type="number" id="manualMin" placeholder="Phút hẹn giờ (VD: 10, 15...)">
+
+    <div id="tempOrder" style="display:none; background:#fffbe6; padding:10px; border-radius:10px; margin-bottom:10px; border:1px dashed orange;">
+        <div id="tempList" style="font-size:11px;"></div>
+        <b>Nước: <span id="tempMoney">0</span>đ</b>
+    </div>
+
+    <div class="category-header">CAFE</div>
+    <div class="menu-grid">
+        <div class="menu-item" onclick="addM('Cafe Đen', 15000)"><b>Cafe Đen</b><span>15k</span></div>
+        <div class="menu-item" onclick="addM('Cafe Sữa', 18000)"><b>Cafe Sữa</b><span>18k</span></div>
+        <div class="menu-item" onclick="addM('Cafe Muối', 22000)"><b>Cafe Muối</b><span>22k</span></div>
+        <div class="menu-item" onclick="addM('Bạc Xỉu', 20000)"><b>Bạc Xỉu</b><span>20k</span></div>
+        <div class="menu-item" onclick="addM('Cafe Caramel ST', 22000)"><b>Caramel ST</b><span>22k</span></div>
+        <div class="menu-item" onclick="addM('Cafe Bơ Đậu Phộng', 20000)"><b>Bơ Đậu Phộng</b><span>20k</span></div>
+    </div>
+
+    <div class="category-header">TRÀ & SỮA CHUA</div>
+    <div class="menu-grid">
+        <div class="menu-item" onclick="addM('Trà Tắc Xí Muội', 15000)"><b>Tắc XM</b><span>15k</span></div>
+        <div class="menu-item" onclick="addM('Trà Đá Me', 15000)"><b>Đá Me</b><span>15k</span></div>
+        <div class="menu-item" onclick="addM('Trà Cam', 18000)"><b>Trà Cam</b><span>18k</span></div>
+        <div class="menu-item" onclick="addM('Cam Tắc Xí Muội', 18000)"><b>Cam Tắc XM</b><span>18k</span></div>
+        <div class="menu-item" onclick="addM('Nước Ép Cam', 18000)"><b>Ép Cam</b><span>18k</span></div>
+        <div class="menu-item" onclick="addM('Trà Đào', 20000)"><b>Trà Đào</b><span>20k</span></div>
+        <div class="menu-item" onclick="addM('Trà Vải', 20000)"><b>Trà Vải</b><span>20k</span></div>
+        <div class="menu-item" onclick="addM('Sữa Chua Việt Quất', 25000)"><b>SC V.Quất</b><span>25k</span></div>
+        <div class="menu-item" onclick="addM('Sữa Chua Dâu', 25000)"><b>SC Dâu</b><span>25k</span></div>
+        <div class="menu-item" onclick="addM('Soda Sữa Chua', 25000)"><b>Soda SC</b><span>25k</span></div>
+    </div>
+
+    <div class="category-header">CACAO & MATCHA</div>
+    <div class="menu-grid">
+        <div class="menu-item" onclick="addM('Cacao Sữa', 18000)"><b>Cacao Sữa</b><span>18k</span></div>
+        <div class="menu-item" onclick="addM('Cacao Late', 20000)"><b>Cacao Late</b><span>20k</span></div>
+        <div class="menu-item" onclick="addM('Cacao Bơ Đậu Phộng', 20000)"><b>Cacao Bơ ĐP</b><span>20k</span></div>
+        <div class="menu-item" onclick="addM('Matcha Sate', 20000)"><b>Matcha Sate</b><span>20k</span></div>
+        <div class="menu-item" onclick="addM('Matcha Dâu', 25000)"><b>Matcha Dâu</b><span>25k</span></div>
+        <div class="menu-item" onclick="addM('Matcha Khoai Môn', 25000)"><b>Matcha KM</b><span>25k</span></div>
+        <div class="menu-item" onclick="addM('Matcha Việt Quất', 25000)"><b>Matcha VQ</b><span>25k</span></div>
+        <div class="menu-item" onclick="addM('Matcha Cacao', 25000)"><b>Matcha CC</b><span>25k</span></div>
+    </div>
+
+    <div class="category-header">TRÀ SỮA & ĂN VẶT</div>
+    <div class="menu-grid">
+        <div class="menu-item" onclick="addM('TSTT', 25000)"><b>TSTT</b><span>25k</span></div>
+        <div class="menu-item" onclick="addM('TS Thái Đỏ', 25000)"><b>TS Thái Đỏ</b><span>25k</span></div>
+        <div class="menu-item" onclick="addM('TS Thái Xanh', 25000)"><b>TS Thái Xanh</b><span>25k</span></div>
+        <div class="menu-item" onclick="addM('TS Khoai Môn', 25000)"><b>TS K.Môn</b><span>25k</span></div>
+        <div class="menu-item" onclick="addM('ST Đường Đen', 25000)"><b>ST Đường Đen</b><span>25k</span></div>
+        <div class="menu-item" onclick="addM('Bánh Tráng Trộn', 20000)"><b>Tráng Trộn</b><span>20k</span></div>
+        <div class="menu-item" onclick="addM('Bánh Tráng Cuộn', 20000)"><b>Tráng Cuộn</b><span>20k</span></div>
+        <div class="menu-item" onclick="addM('Bánh Tráng Chấm', 20000)"><b>Tráng Chấm</b><span>20k</span></div>
+        <div class="menu-item" onclick="addM('Nước Ngọt Lon', 20000)"><b>Nước Ngọt</b><span>20k</span></div>
+    </div>
+    
+    <button onclick="start()" class="btn-main" style="margin-top:15px;">BẮT ĐẦU CHƠI</button>
+</div>
+
+<div id="activeList"></div>
+
+<div id="extraBar" class="status-bar">
+    <div style="font-size:12px; font-weight:bold;">Đang chọn thêm cho: <span id="extraName" style="color:red;"></span></div>
+    <button onclick="finishExtra()" class="btn-pay" style="margin-top:5px; background:var(--primary);">XONG / LƯU LẠI</button>
+</div>
+
+<div id="billModal" class="modal"><div class="bill-box" id="billContent"></div></div>
+
+<script>
+    let active = JSON.parse(localStorage.getItem('quan_final')) || [];
+    let tItems = []; let tPrice = 0;
+    let addingId = null;
+
+    function requestNoti() { Notification.requestPermission(); }
+
+    function addM(n, p) {
+        if(addingId) {
+            const idx = active.findIndex(x => x.id === addingId);
+            active[idx].waterList.push({name: n, price: p});
+            active[idx].waterPrice += p;
+            document.getElementById('extraName').innerText = active[idx].name + " (+1 món)";
+            save();
+        } else {
+            tItems.push({name: n, price: p}); tPrice += p;
+            document.getElementById('tempOrder').style.display = 'block';
+            document.getElementById('tempList').innerText = "Đã chọn: " + tItems.map(x=>x.name).join(', ');
+            document.getElementById('tempMoney').innerText = tPrice.toLocaleString();
+        }
+    }
+
+    function start() {
+        const name = document.getElementById('cusName').value;
+        if(!name) return alert("Nhập tên!");
+        const startT = Date.now();
+        const mMin = document.getElementById('manualMin').value;
+        active.push({
+            id: startT, name, table: document.getElementById('tableNo').value || "??",
+            mode: mMin ? parseInt(mMin) : 0, start: startT,
+            end: mMin ? startT + (parseInt(mMin) * 60000) : null,
+            waterPrice: tPrice, waterList: [...tItems], notified: false
+        });
+        tItems = []; tPrice = 0;
+        document.getElementById('tempOrder').style.display = 'none';
+        document.getElementById('cusName').value = ''; document.getElementById('manualMin').value = '';
+        save(); render();
+    }
+
+    function openExtra(id) {
+        addingId = id;
+        document.getElementById('extraName').innerText = active.find(x=>x.id===id).name;
+        document.getElementById('extraBar').style.display = 'block';
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function finishExtra() { addingId = null; document.getElementById('extraBar').style.display = 'none'; render(); }
+
+    function save() { localStorage.setItem('quan_final', JSON.stringify(active)); }
+
+    function render() {
+        const list = document.getElementById('activeList'); list.innerHTML = '';
+        const now = Date.now();
+        active.forEach(c => {
+            const playedMin = Math.floor((now - c.start) / 60000);
+            const isHen = c.mode > 0;
+            const diff = isHen ? c.end - now : now - c.start;
+            const isExp = isHen && diff <= 0;
+
+            if(isExp && !c.notified && Notification.permission === "granted") {
+                new Notification("HẾT GIỜ: " + c.name);
+                c.notified = true; save();
+            }
+
+            let gameP = Math.round((playedMin * (50000 / 60)) / 1000) * 1000;
+            const total = gameP + c.waterPrice;
+
+            list.innerHTML += `<div class="car-card">
+                <div style="display:flex; justify-content:space-between;">
+                    <b>${c.name} - Bàn ${c.table}</b>
+                    <span class="${isExp?'expired':''}" style="padding:2px 8px; border-radius:5px; font-weight:bold; background:#eee;">
+                        ${isHen ? Math.floor(Math.abs(diff)/60000) + 'p' : playedMin + 'p'}
+                    </span>
+                </div>
+                <div style="text-align:right; font-weight:bold; color:red; font-size:18px; margin-top:10px;">TỔNG: ${total.toLocaleString()}đ</div>
+                <div style="display:flex; gap:5px; margin-top:10px;">
+                    <button onclick="openExtra(${c.id})" style="flex:1; background:var(--warning); border:none; padding:8px; border-radius:5px; font-weight:bold;">+ MÓN</button>
+                    <button onclick="showBill(${c.id})" style="flex:1; background:var(--success); color:white; border:none; padding:8px; border-radius:5px; font-weight:bold;">THANH TOÁN</button>
+                </div>
+            </div>`;
+        });
+    }
+
+    function showBill(id) {
+        const c = active.find(x => x.id === id);
+        const pMin = Math.floor((Date.now() - c.start) / 60000);
+        let gameP = Math.round((pMin * (50000 / 60)) / 1000) * 1000;
+        let itemsHtml = c.waterList.map(i => `<div class="bill-row"><span>${i.name}</span><span>${i.price.toLocaleString()}</span></div>`).join('');
+        
+        document.getElementById('billContent').innerHTML = `
+            <div style="text-align:center; border-bottom:1px dashed #333; padding-bottom:10px; margin-bottom:10px;"><h3>HÓA ĐƠN</h3><b>${c.name} - Bàn ${c.table}</b></div>
+            ${itemsHtml}
+            <div class="bill-row"><span>Tiền giờ (${pMin}p)</span><span>${gameP.toLocaleString()}</span></div>
+            <div style="border-top:1px dashed #333; margin-top:10px; padding-top:10px; font-weight:bold; font-size:18px; color:red;" class="bill-row">
+                <span>TỔNG:</span><span>${(gameP + c.waterPrice).toLocaleString()}đ</span>
+            </div>
+            <button onclick="confirmPay(${id})" class="btn-pay">XÁC NHẬN THU TIỀN</button>
+            <button onclick="closeBill()" style="width:100%; border:none; background:none; color:blue; margin-top:10px;">Quay lại</button>
+        `;
+        document.getElementById('billModal').style.display = 'flex';
+    }
+
+    function confirmPay(id) { active = active.filter(x => x.id !== id); save(); render(); closeBill(); }
+    function closeBill() { document.getElementById('billModal').style.display = 'none'; }
+    setInterval(render, 5000); render();
+</script>
+</body>
+</html>
